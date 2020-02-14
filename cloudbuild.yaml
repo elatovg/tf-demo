@@ -1,0 +1,27 @@
+steps:
+- id: 'deploy-demo'
+  name: 'gcr.io/$PROJECT_ID/terraform-make'
+  args: ['remote']
+  env:
+    - 'REGION=${_REGION}'
+    - 'PROJECT_ID=$PROJECT_ID'
+    - 'BUCKET=${_BUCKET}'
+
+- id: 'validate-demo'
+  waitFor: ['deploy-demo']
+  name: 'gcr.io/$PROJECT_ID/terraform-make'
+  args: ['validate']
+  env:
+    - 'REGION=${_REGION}'
+    - 'PROJECT_ID=$PROJECT_ID'
+
+#- id: 'remove-demo'
+#  waitFor: ['validate-demo']
+#  name: 'gcr.io/$PROJECT_ID/terraform-make'
+#  args: ['teardown']
+#  env:
+#    - 'REGION=${_REGION_}'
+#    - 'PROJECT_ID=$PROJECT_ID'
+substitutions:
+    _BUCKET: terraform-st # Provide your own bucket name or use the default value
+    _REGION: us-east4 # Provide your own region or use the default value

@@ -1,0 +1,35 @@
+# OSX creates these on SMB shares
+._*
+
+# OSX
+.DS_Store
+
+# Vim-related files
+[._]*.s[a-w][a-z]
+[._]s[a-w][a-z]
+*.un~
+Session.vim
+.netrwhist
+
+# IntelliJ IDE
+.idea
+*.iml
+*.iws
+*.ipr
+
+
+### https://raw.github.com/github/gitignore/90f149de451a5433aebd94d02d11b0e28843a1af/Terraform.gitignore
+
+# Local .terraform directories
+**/.terraform/*
+terraform.tfvars
+be.tf
+
+# .tfstate files
+*.tfstate
+*.tfstate.*
+
+# Crash log files
+crash.log
+
+.vscode
