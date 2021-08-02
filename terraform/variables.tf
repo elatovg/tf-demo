@@ -21,17 +21,17 @@ These must be provided at runtime.
 
 variable "region" {
   description = "The region in which to create Demo"
-  type        = "string"
+  type        = string
 }
 
 variable "project" {
   description = "The name of the project in which to create the demo."
-  type        = "string"
+  type        = string
 }
 
 variable "mig-machine-type" {
   description = "Machine type to use for the instance template"
-  type        = "string"
+  type        = string
   default     = "f1-micro"
 }
 
