@@ -117,7 +117,8 @@ resource "google_compute_instance_template" "tf-mig-template" {
 
 // Create the MIG
 resource "google_compute_instance_group_manager" "webservers" {
-  name = "webservers-mig"
+  project = var.project
+  name    = "webservers-mig"
   version {
     instance_template = google_compute_instance_template.tf-mig-template.self_link
   }
