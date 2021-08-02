@@ -61,6 +61,7 @@ resource "google_compute_subnetwork" "subnet" {
 // Create the GCE instance
 resource "google_compute_instance" "demo-gce" {
   zone         = local.random_zone
+  project      = var.project
   name         = random_id.gce.hex
   machine_type = "f1-micro"
   boot_disk {
@@ -78,6 +79,7 @@ resource "google_compute_instance" "demo-gce" {
 
 // Create Instance Template
 resource "google_compute_instance_template" "tf-mig-template" {
+  project      = var.project
   name_prefix  = "tf-mg-tmplt-"
   machine_type = var.mig-machine-type
   region       = var.region
