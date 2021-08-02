@@ -24,12 +24,13 @@ resource "random_id" "gce" {
 }
 
 data "google_compute_zones" "available" {
+  project = var.project
   region = "${var.region}"
 }
 
 // Randomize the Zone Choice
 resource "random_shuffle" "gz" {
-  input = ["${data.google_compute_zones.available.names}"]
+  input = "${data.google_compute_zones.available.names}"
   result_count = 1
 }
 
