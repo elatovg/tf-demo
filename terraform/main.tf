@@ -19,23 +19,23 @@ limitations under the License.
 ///////////////////////////////////////////////////////////////////////////////////////
 
 resource "random_id" "gce" {
- byte_length = 4
- prefix      = "tf-compute-"
+  byte_length = 4
+  prefix      = "tf-compute-"
 }
 
 data "google_compute_zones" "available" {
   project = var.project
-  region = "${var.region}"
+  region  = var.region
 }
 
 // Randomize the Zone Choice
 resource "random_shuffle" "gz" {
-  input = "${data.google_compute_zones.available.names}"
+  input        = data.google_compute_zones.available.names
   result_count = 1
 }
 
 locals {
-  random_zone = "${random_shuffle.gz.result[0]}"
+  random_zone = random_shuffle.gz.result[0]
 }
 
 // Select Image to use for GCE and MIG
@@ -45,40 +45,41 @@ data "google_compute_image" "base_image" {
 }
 
 resource "google_compute_network" "vpc_network" {
-  name = "custom"
+  name                    = "custom"
+  project                 = var.project
   auto_create_subnetworks = false
 }
 
 resource "google_compute_subnetwork" "subnet" {
-  name          = "${var.region}"
+  name          = var.region
   ip_cidr_range = "10.2.0.0/16"
-  region        = "${var.region}"
+  region        = var.region
   network       = google_compute_network.vpc_network.id
 }
 
 // Create the GCE instance
 resource "google_compute_instance" "demo-gce" {
-  zone = "${local.random_zone}"
-  name = "${random_id.gce.hex}"
+  zone         = local.random_zone
+  name         = random_id.gce.hex
   machine_type = "f1-micro"
   boot_disk {
-   initialize_params {
-     image = "${data.google_compute_image.base_image.project}/${data.google_compute_image.base_image.family}"
-//     image = "debian-cloud/debian-9"
-   }
+    initialize_params {
+      image = "${data.google_compute_image.base_image.project}/${data.google_compute_image.base_image.family}"
+      //     image = "debian-cloud/debian-9"
+    }
   }
   network_interface {
-   subnetwork = google_compute_subnetwork.subnet.id
-   // Include this section to give the VM an external ip address
-  #  access_config = {}
+    subnetwork = google_compute_subnetwork.subnet.id
+    // Include this section to give the VM an external ip address
+    #  access_config = {}
   }
 }
 
 // Create Instance Template
 resource "google_compute_instance_template" "tf-mig-template" {
   name_prefix  = "tf-mg-tmplt-"
-  machine_type = "${var.mig-machine-type}"
-  region       = "${var.region}"
+  machine_type = var.mig-machine-type
+  region       = var.region
 
   // Give minimal scopes to run as
   service_account {
@@ -97,7 +98,7 @@ resource "google_compute_instance_template" "tf-mig-template" {
   #   startup-script-url = "${var.start-up-url}"
   # }
 
-  tags = "${var.target_tags}"
+  tags = var.target_tags
   // Add internal IP
   network_interface {
     subnetwork = google_compute_subnetwork.subnet.id
@@ -113,12 +114,12 @@ resource "google_compute_instance_template" "tf-mig-template" {
 
 // Create the MIG
 resource "google_compute_instance_group_manager" "webservers" {
-  name               = "webservers-mig"
+  name = "webservers-mig"
   version {
-    instance_template  = "${google_compute_instance_template.tf-mig-template.self_link}"
+    instance_template = google_compute_instance_template.tf-mig-template.self_link
   }
   base_instance_name = "web"
-  zone               = "${local.random_zone}"
+  zone               = local.random_zone
   target_size        = "1"
 }
 
@@ -153,6 +154,7 @@ resource "google_compute_instance_group_manager" "webservers" {
 // Add health check for the MIG
 resource "google_compute_health_check" "mig-hc-http" {
   name    = "mig-http"
+  project = var.project
   http_health_check {
     port = "80"
   }
@@ -165,10 +167,10 @@ resource "google_compute_region_backend_service" "ilb-backend-service" {
   timeout_sec                     = 25
   connection_draining_timeout_sec = 10
   session_affinity                = "CLIENT_IP"
-  region                          = "${var.region}"
+  region                          = var.region
 
   backend {
-    group = "${google_compute_instance_group_manager.webservers.instance_group}"
+    group = google_compute_instance_group_manager.webservers.instance_group
   }
 
   health_checks = ["${google_compute_health_check.mig-hc-http.self_link}"]
@@ -177,15 +179,16 @@ resource "google_compute_region_backend_service" "ilb-backend-service" {
 // Add an internal Forwarding Rule to the backend service
 resource "google_compute_forwarding_rule" "ilb-fw-rule" {
   name                  = "ilb-fw-rule"
-  region                = "${var.region}"
+  region                = var.region
   network               = google_compute_network.vpc_network.name
   load_balancing_scheme = "INTERNAL"
-  backend_service       = "${google_compute_region_backend_service.ilb-backend-service.self_link}"
+  backend_service       = google_compute_region_backend_service.ilb-backend-service.self_link
   ip_protocol           = "TCP"
   ports                 = ["80"]
 }
 
 resource "google_project_service" "compute" {
-  service = "compute.googleapis.com"
+  project            = var.project
+  service            = "compute.googleapis.com"
   disable_on_destroy = false
 }

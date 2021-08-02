@@ -15,19 +15,19 @@ limitations under the License.
 */
 
 output "gce_name" {
-  value = "${google_compute_instance.demo-gce.name}"
+  value = google_compute_instance.demo-gce.name
 }
 
 output "gce_zone" {
-  value = "${google_compute_instance.demo-gce.zone}"
+  value = google_compute_instance.demo-gce.zone
 }
 
 output "instance_template" {
-  value = "${google_compute_instance_template.tf-mig-template.name}"
+  value = google_compute_instance_template.tf-mig-template.name
 }
 
 output "mig" {
-  value = "${google_compute_instance_group_manager.webservers.name}"
+  value = google_compute_instance_group_manager.webservers.name
 }
 
 //output "hc_fw_rule" {
@@ -39,17 +39,17 @@ output "mig" {
 //}
 
 output "hc_http" {
-  value = "${google_compute_health_check.mig-hc-http.name}"
+  value = google_compute_health_check.mig-hc-http.name
 }
 
 output "ilb_be" {
-  value = "${google_compute_region_backend_service.ilb-backend-service.name}"
+  value = google_compute_region_backend_service.ilb-backend-service.name
 }
 
 output "ilb_forward_rule" {
-  value = "${google_compute_forwarding_rule.ilb-fw-rule.name}"
+  value = google_compute_forwarding_rule.ilb-fw-rule.name
 }
 
 output "ilb_ip" {
-  value = "${google_compute_forwarding_rule.ilb-fw-rule.ip_address}"
+  value = google_compute_forwarding_rule.ilb-fw-rule.ip_address
 }
