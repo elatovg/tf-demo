@@ -49,6 +49,6 @@ variable "mig-machine-type" {
 
 variable "target_tags" {
   description = "Network Tags to add to Instance Template"
-  type        = "list"
+  type        = list
   default     = ["ilb-web"]
 }

@@ -69,7 +69,7 @@ resource "google_compute_instance" "demo-gce" {
   network_interface {
    subnetwork = google_compute_subnetwork.subnet.id
    // Include this section to give the VM an external ip address
-   access_config = {}
+  #  access_config = {}
   }
 }
 
@@ -101,7 +101,7 @@ resource "google_compute_instance_template" "tf-mig-template" {
   network_interface {
     subnetwork = google_compute_subnetwork.subnet.id
     // External IP
-    access_config = {}
+    # access_config = {}
   }
 
   // Recommended for doing updates with new Images for MIGs
@@ -113,7 +113,9 @@ resource "google_compute_instance_template" "tf-mig-template" {
 // Create the MIG
 resource "google_compute_instance_group_manager" "webservers" {
   name               = "webservers-mig"
-  instance_template  = "${google_compute_instance_template.tf-mig-template.self_link}"
+  version {
+    instance_template  = "${google_compute_instance_template.tf-mig-template.self_link}"
+  }
   base_instance_name = "web"
   zone               = "${local.random_zone}"
   target_size        = "1"
@@ -175,7 +177,7 @@ resource "google_compute_region_backend_service" "ilb-backend-service" {
 resource "google_compute_forwarding_rule" "ilb-fw-rule" {
   name                  = "ilb-fw-rule"
   region                = "${var.region}"
-  network               = "${var.network}"
+  network               = google_compute_network.vpc_network.name
   load_balancing_scheme = "INTERNAL"
   backend_service       = "${google_compute_region_backend_service.ilb-backend-service.self_link}"
   ip_protocol           = "TCP"
