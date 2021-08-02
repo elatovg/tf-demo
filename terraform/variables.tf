@@ -41,11 +41,11 @@ variable "mig-machine-type" {
 #   default     = "gs://your_storage_bucket/startup.sh"
 # }
 
-variable "network" {
-  description = "VPC to use for the demo"
-  type        = "string"
-  default     = "default"
-}
+# variable "network" {
+#   description = "VPC to use for the demo"
+#   type        = "string"
+#   default     = "default"
+# }
 
 variable "target_tags" {
   description = "Network Tags to add to Instance Template"
