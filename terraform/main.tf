@@ -166,6 +166,7 @@ resource "google_compute_health_check" "mig-hc-http" {
 
 // Add Regional Backend pointing to Instance Group Above
 resource "google_compute_region_backend_service" "ilb-backend-service" {
+  project                         = var.project
   name                            = "ilb-be"
   protocol                        = "TCP"
   timeout_sec                     = 25
@@ -183,6 +184,7 @@ resource "google_compute_region_backend_service" "ilb-backend-service" {
 // Add an internal Forwarding Rule to the backend service
 resource "google_compute_forwarding_rule" "ilb-fw-rule" {
   name                  = "ilb-fw-rule"
+  project               = var.project
   region                = var.region
   network               = google_compute_network.vpc_network.name
   load_balancing_scheme = "INTERNAL"
