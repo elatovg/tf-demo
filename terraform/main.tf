@@ -187,6 +187,7 @@ resource "google_compute_forwarding_rule" "ilb-fw-rule" {
   project               = var.project
   region                = var.region
   network               = google_compute_network.vpc_network.name
+  subnetwork            = google_compute_subnetwork.subnet.name
   load_balancing_scheme = "INTERNAL"
   backend_service       = google_compute_region_backend_service.ilb-backend-service.self_link
   ip_protocol           = "TCP"
