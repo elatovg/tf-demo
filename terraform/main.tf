@@ -39,8 +39,20 @@ locals {
 
 // Select Image to use for GCE and MIG
 data "google_compute_image" "base_image" {
-  family  = "debian-9"
+  family  = "debian-10"
   project = "debian-cloud"
+}
+
+resource "google_compute_network" "vpc_network" {
+  name = "custom"
+  auto_create_subnetworks = false
+}
+
+resource "google_compute_subnetwork" "subnet" {
+  name          = "${var.region}"
+  ip_cidr_range = "10.2.0.0/16"
+  region        = "${var.region}"
+  network       = google_compute_network.vpc_network.id
 }
 
 // Create the GCE instance
@@ -55,7 +67,7 @@ resource "google_compute_instance" "demo-gce" {
    }
   }
   network_interface {
-   network = "default"
+   subnetwork = google_compute_subnetwork.subnet.id
    // Include this section to give the VM an external ip address
    access_config = {}
   }
@@ -80,14 +92,14 @@ resource "google_compute_instance_template" "tf-mig-template" {
   }
 
   // Add metadata
-  metadata {
-    startup-script-url = "${var.start-up-url}"
-  }
+  # metadata {
+  #   startup-script-url = "${var.start-up-url}"
+  # }
 
   tags = "${var.target_tags}"
   // Add internal IP
   network_interface {
-    network = "default"
+    subnetwork = google_compute_subnetwork.subnet.id
     // External IP
     access_config = {}
   }

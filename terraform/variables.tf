@@ -35,11 +35,11 @@ variable "mig-machine-type" {
   default     = "f1-micro"
 }
 
-variable "start-up-url" {
-  description = "Specify startup script for the instance"
-  type        = "string"
-  default     = "gs://your_storage_bucket/startup.sh"
-}
+# variable "start-up-url" {
+#   description = "Specify startup script for the instance"
+#   type        = "string"
+#   default     = "gs://your_storage_bucket/startup.sh"
+# }
 
 variable "network" {
   description = "VPC to use for the demo"
